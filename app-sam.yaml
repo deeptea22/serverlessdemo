@@ -48,7 +48,7 @@ Resources:
   ListInstitutionsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: ListInstitutions
+      FunctionName: ListInstitutionsTest
       Handler: com.hcl.adi.chf.lambda.ListInstitutions
       Role: 
         Fn::ImportValue: ServerlessLambdaDemoRole
