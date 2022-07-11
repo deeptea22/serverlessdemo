@@ -39,19 +39,19 @@ Globals:
 #          - Fn::ImportValue: AdiChf-SubnetsPrivate
     VpcConfig:
       SecurityGroupIds:
-        - sg-085912345678492fb
+        - sg-39b9db00
       SubnetIds:
-        - subnet-071f712345678e7c8
-        - subnet-07fd123456788a036          
+        - subnet-7f039471
+        - subnet-88d0bdc5          
                 
 Resources:
   ListInstitutionsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: ListInstitutions
+      FunctionName: ListInstitutionsDemo
       Handler: com.hcl.adi.chf.lambda.ListInstitutions
       Role: 
-        Fn::ImportValue: AdiBasicRoleForLambdasUAT
+        Fn::ImportValue: ServerlessLambdaDemoRole
       CodeUri: target/adi_module-1.0.0.jar
       Description: This lambda function will return the list of institutions  
 #      Environment: 
@@ -71,7 +71,7 @@ Resources:
       FunctionName: ListInstitutionAdmins 
       Handler: com.hcl.adi.chf.lambda.ListInstitutionAdmins
       Role: 
-        Fn::ImportValue: AdiBasicRoleForLambdasUAT
+        Fn::ImportValue: ServerlessLambdaDemoRole
       CodeUri: target/adi_module-1.0.0.jar
       Description: This lambda function will return the list of institution admins   
 #      Environment: 
@@ -82,8 +82,4 @@ Resources:
 #          DB_PORT: '{{resolve:ssm:/uat/db/port:1}}'
 #          DB_SCHEMA_NAME: '{{resolve:ssm:/uat/db/name:1}}'
 #          DB_USER_NAME: '{{resolve:ssm:/uat/db/username:1}}'        
-#          SQL_PROPERTIES_FILE_LOCATION: '{{resolve:ssm:/uat/db/sqllocation:1}}'        
-
-
-
-  
+#          SQL_PROPERTIES_FILE_LOCATION: '{{resolve:ssm:/uat/db/sqllocation:1}}'
