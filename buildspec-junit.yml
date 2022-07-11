@@ -1,0 +1,31 @@
+version: 0.2
+env:
+    variables:
+       DB_DRIVER_CLASS_NAME: "org.h2.Driver"
+       DB_PROTOCOL: "jdbc:h2:mem://"
+       DB_HOSTNAME: "localhost"
+       DB_PORT: "9092"
+       DB_SCHEMA_NAME: "mem:test"
+       DB_USER_NAME: ""
+       DB_PASSWORD: ""
+       COGNITO_POOL_ID: "ap-southeast-2_J5Mt02dD2"
+       COGNITO_POOL_REGION_NAME: "ap-southeast-2"
+phases:
+    install:
+        runtime-versions:
+            java: openjdk11
+        commands:
+            - echo Entering install phase...
+            - wget https://jcenter.bintray.com/org/apache/maven/apache-maven/3.3.9/apache-maven-3.3.9-bin.tar.gz
+            - tar xzvf apache-maven-3.3.9-bin.tar.gz -C /opt/
+            - export PATH=/opt/apache-maven-3.3.9/bin:$PATH
+    build:
+        commands:
+            - echo Entering build phase...
+            - echo Build started on `date`
+            - mvn test
+            - mvn clean package
+artifacts:
+    files:
+      - '**/*'
+    name: JunitZip

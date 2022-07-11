@@ -1,0 +1,96 @@
+Since both the ID token and the access token are JSON Web Tokens (JWT), you may use any of the available JWT libraries to decode the JWT and verify the signature. For example, if your platform is Java, you could use the Nimbus JOSE and JWT library.
+To verify a signature for ID and access tokens:
+(1) Download and store the JSON Web Key (JWK) for your user pool. You can locate it at https://cognito-idp.{region}.amazonaws.com/{userPoolId}/.well-known/jwks.json.
+
+Each JWK should be stored against its kid.
+
+(2) Decode the token string into JWT format.
+
+(3) Check the iss claim. It should match your user pool. For example, a user pool created in the us-east-1 region will have an iss value of https://cognito-idp.us-east-1.amazonaws.com/{userPoolId}.
+
+(4) Check the token_use claim.
+
+	(4.1) If you are only accepting the access token in your web APIs, its value must be access.
+
+	(4.2) If you are only using the ID token, its value must be id.
+
+	(4.3) If you are using both tokens, the value is either id or access.
+
+(5) Get the kid from the JWT token header and retrieve the corresponding JSON Web Key that was stored in step 1.
+
+(6) Verify the signature of the decoded JWT token.
+
+(7) Check the exp claim and make sure the token is not expired.
+
+Note: Since, We are using Nimbus Jose library, so no need to manually verify the signature and expiry of the tokens. 
+It would be handled by library itself by providing JWKs file URL, Algorithm and token to the library. However, specific claims need to be verified manually.
+Moreover, since signature would be verified against the Jwks file so by default iss would also be verified as we know that each
+JWK gets stored against its kid
+
+Example of id Token Returned From Cognito:
+eyJraWQiOiJtWGVnNVZOcStRXC9DUXNMQ3loZ0lHenJweTNxZXBBUXNsUWM1bk0yXC9aQ289IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJiYThmMTc3ZC03NzM1LTRjZjYtYjU4Ny0zYjQ4YmJiM2YyOTgiLCJhdWQiOiI1cHMzdjc2OWJkbzA1dWVjYTNwZjU1aGNmcCIsImNvZ25pdG86Z3JvdXBzIjpbInN1cGVyX2FkbWluIl0sImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJldmVudF9pZCI6IjQ1MDc5NDBiLTU4MzUtNGNhYS05YTc5LTIyNzhiZGZkOGQxYSIsInRva2VuX3VzZSI6ImlkIiwiYXV0aF90aW1lIjoxNTYwMjcxMDA5LCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb21cL3VzLWVhc3QtMV90c3dUSVEwZ0giLCJjb2duaXRvOnVzZXJuYW1lIjoiZGluZXNoLWt1bWFAaGNsLmNvbSIsImV4cCI6MTU2MDI3NDYwOSwiaWF0IjoxNTYwMjcxMDA5LCJlbWFpbCI6ImRpbmVzaC1rdW1hQGhjbC5jb20ifQ.ABem5ocrkB1riEo2Rt2zFVWQdHPItnXZlO9P0H1xgAsJJIw8hf61UoJqw7hcZGyQBue9FGI_AeskSbGTD2BxNdYGYrUqLTrSvzeD7hZt_M0ejbheju6iI6_9SHo1E7eYDMxOOMV7DEFRmVuotuQrw9c0wJnstvwvB2r135izvNV8XQKG9-a6TWW5VAuQl-s8PIzDmXyk8G9L30GBkb0BxPc4sdzAMEk6V55MFuGWWIuJvluQl65BZHPKcmIWt39S0QVp9dlYLLGwoUbeE_J3fZPo1I0ghioRXR5qcZQ9xapaWeYd8WMZqwU1v4Onsb9czmmmkaR5ts1VNa9K6IkFGg
+
+Header extracted from id token after decoding:
+{  
+   "kid":"mXeg5VNq+Q/CQsLCyhgIGzrpy3qepAQslQc5nM2/ZCo=",
+   "alg":"RS256"
+}
+
+Payload extracted from id token after decoding:
+{  
+   "sub":"ba8f177d-7735-4cf6-b587-3b48bbb3f298",
+   "cognito:groups":[  
+      "super_admin"
+   ],
+   "email_verified":true,
+   "iss":"https://cognito-idp.us-east-1.amazonaws.com/us-east-1_tswTIQ0gH",
+   "cognito:username":"dinesh-kuma@hcl.com",
+   "aud":"5ps3v769bdo05ueca3pf55hcfp",
+   "event_id":"e421e4e8-b8ba-4202-9768-cb9c28096623",
+   "token_use":"id",
+   "auth_time":1560429528,
+   "exp":1560433128,
+   "iat":1560429528,
+   "email":"dinesh-kuma@hcl.com"
+}
+
+Payload extracted from access token after decoding:
+{
+    "sub": "ba8f177d-7735-4cf6-b587-3b48bbb3f298",
+    "cognito:groups": [
+        "super_admin"
+    ],
+    "event_id": "e421e4e8-b8ba-4202-9768-cb9c28096623",
+    "token_use": "access",
+    "scope": "aws.cognito.signin.user.admin",
+    "auth_time": 1560429528,
+    "iss": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_tswTIQ0gH",
+    "exp": 1560433128,
+    "iat": 1560429528,
+    "jti": "f608580c-8e66-49e3-bf25-c83db7b0dacf",
+    "client_id": "5ps3v769bdo05ueca3pf55hcfp",
+    "username": "dinesh-kuma@hcl.com"
+}
+
+Note: Name of Keys in the decoded token are called as claims
+
+Sample Policy:
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Condition": {},
+      "Action": "execute-api:Invoke",
+      "Resource": [
+        "arn:aws:execute-api:us-east-1:145473561237:y1e8a0m6zk/dev/*/createSuperAdmin"
+      ],
+      "Effect": "Allow"
+    },
+    {
+      "Condition": {},
+      "Action": "execute-api:Invoke",
+      "Resource": [],
+      "Effect": "Deny"
+    }
+  ]
+}

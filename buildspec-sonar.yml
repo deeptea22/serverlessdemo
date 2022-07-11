@@ -1,0 +1,28 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+       java: openjdk8
+  pre_build:
+    commands:
+            - apt-get update
+            - apt-get install -y jq
+  build:
+    commands:
+        - mvn clean install sonar:sonar
+         -Dmaven.test.skip=true
+         -Dsonar.projectName="Adi_Sonar_Uat" 
+         -Dsonar.projectKey="com.hcl.adi.chf:adi_module" 
+         -Dsonar.host.url=http://sonaradiuat.adichfiot.com:9000/
+         -Dsonar.login=b6961a292f539c489c855edee8cf2720893f60f2
+        - sleep 5
+        - curl http://sonaradiuat.adichfiot.com:9000/api/qualitygates/project_status?projectKey=com.hcl.adi.chf:adi_module > result.json
+        - cat result.json
+        - if [ $(jq -r '.projectStatus.status' result.json) = ERROR ] ; then $CODEBUILD_BUILD_SUCCEEDING -eq 0 ;fi
+  post_build:
+    commands:
+      - echo Build completed on `date`        
+artifacts:
+  files:
+    - '**/*'
+  name: SonarZip

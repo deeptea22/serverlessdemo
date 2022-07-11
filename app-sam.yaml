@@ -1,0 +1,89 @@
+AWSTemplateFormatVersion: '2010-09-09' 
+Transform: AWS::Serverless-2016-10-31 
+ 
+Parameters: 
+  Stage: 
+    Type: String 
+    AllowedValues: 
+      - demo
+      - staging
+      - uat
+    Default: demo 
+    Description: Stage that can be added to resource names
+    
+  AWSEmailRegion:
+    Description: EMAIL_REGION
+    Type: String
+    Default: us-east-1
+    
+#  AWSAdiModule:
+#    Description: Adi Code Jar Module
+#    Type: String
+#    Default: serverless_module-1.0.0
+    
+Globals:
+  Function:
+    Runtime: java8
+    MemorySize: 512
+    Timeout: 15
+    Tags:
+      Environment: DEMO
+#    VpcConfig:
+#      SecurityGroupIds: 
+#        'Fn::Split':
+#          - ','
+#          - 'Fn::ImportValue': ADILambdaSecurityGroup
+#      SubnetIds:
+#        Fn::Split:
+#          - ","
+#          - Fn::ImportValue: AdiChf-SubnetsPrivate
+    VpcConfig:
+      SecurityGroupIds:
+        - sg-085912345678492fb
+      SubnetIds:
+        - subnet-071f712345678e7c8
+        - subnet-07fd123456788a036          
+                
+Resources:
+  ListInstitutionsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: ListInstitutions
+      Handler: com.hcl.adi.chf.lambda.ListInstitutions
+      Role: 
+        Fn::ImportValue: AdiBasicRoleForLambdasUAT
+      CodeUri: target/adi_module-1.0.0.jar
+      Description: This lambda function will return the list of institutions  
+#      Environment: 
+#        Variables:
+#          DB_HOSTNAME:
+#            Fn::ImportValue: AdiChfDBClusterEndpointDnsRecordUAT
+#          DB_PASSWORD: '{{resolve:ssm:/uat/adidb/masterpass:1}}'
+#          DB_PORT: '{{resolve:ssm:/uat/db/port:1}}'
+#          DB_SCHEMA_NAME: '{{resolve:ssm:/uat/db/name:1}}'
+#          DB_USER_NAME: '{{resolve:ssm:/uat/db/username:1}}'      
+#          SQL_PROPERTIES_FILE_LOCATION: '{{resolve:ssm:/uat/db/sqllocation:1}}' 
+
+
+  ListInstitutionAdminsFunction:
+    Type: AWS::Serverless::Function
+    Properties: 
+      FunctionName: ListInstitutionAdmins 
+      Handler: com.hcl.adi.chf.lambda.ListInstitutionAdmins
+      Role: 
+        Fn::ImportValue: AdiBasicRoleForLambdasUAT
+      CodeUri: target/adi_module-1.0.0.jar
+      Description: This lambda function will return the list of institution admins   
+#      Environment: 
+#        Variables:
+#          DB_HOSTNAME:
+#            Fn::ImportValue: AdiChfDBClusterEndpointDnsRecordUAT
+#          DB_PASSWORD: '{{resolve:ssm:/uat/adidb/masterpass:1}}'
+#          DB_PORT: '{{resolve:ssm:/uat/db/port:1}}'
+#          DB_SCHEMA_NAME: '{{resolve:ssm:/uat/db/name:1}}'
+#          DB_USER_NAME: '{{resolve:ssm:/uat/db/username:1}}'        
+#          SQL_PROPERTIES_FILE_LOCATION: '{{resolve:ssm:/uat/db/sqllocation:1}}'        
+
+
+
+  
